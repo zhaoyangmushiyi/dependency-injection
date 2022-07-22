@@ -73,24 +73,50 @@ public class BeanDefinition {
             return isRef;
         }
 
-        public void setRef(boolean ref) {
-            isRef = ref;
-        }
-
         public Class getType() {
             return type;
-        }
-
-        public void setType(Class type) {
-            this.type = type;
         }
 
         public Object getArg() {
             return arg;
         }
 
-        public void setArg(Object arg) {
+        private ConstructorArg(boolean isRef, Class type, Object arg) {
+            this.isRef = isRef;
+            this.type = type;
             this.arg = arg;
         }
+
+        public static class Builder{
+            private boolean ref = false;
+            private Class type;
+            private Object arg;
+
+            public ConstructorArg build() {
+                if (ref && type != null) {
+                    throw new RuntimeException("bean为ref类型时type不需要设置");
+                }
+                if (!ref && (type == null || arg == null)) {
+                    throw new RuntimeException("bean不为ref类型时type和arg必须填写");
+                }
+                return new ConstructorArg(ref, type, arg);
+            }
+
+            public Builder setRef(boolean ref) {
+                this.ref = ref;
+                return this;
+            }
+
+            public Builder setType(Class type) {
+                this.type = type;
+                return this;
+            }
+
+            public Builder setArg(Object arg) {
+                this.arg = arg;
+                return this;
+            }
+        }
+
     }
 }

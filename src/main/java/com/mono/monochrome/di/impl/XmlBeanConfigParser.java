@@ -8,7 +8,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,25 +51,25 @@ public class XmlBeanConfigParser implements BeanConfigParser {
                 Iterator argsIt = bean.elementIterator();
                 List<BeanDefinition.ConstructorArg> constructorArgs = new ArrayList<>();
                 while(argsIt.hasNext()){
-                    BeanDefinition.ConstructorArg constructorArg = new BeanDefinition.ConstructorArg();
+                    BeanDefinition.ConstructorArg.Builder builder = new BeanDefinition.ConstructorArg.Builder();
                     Element arg = (Element) argsIt.next();
                     List<Attribute> argAttributes = arg.attributes();
                     // 获取bean属性名和属性值
                     for (Attribute attribute : argAttributes) {
                         if ("type".equals(attribute.getName())) {
                             try {
-                                constructorArg.setType(Class.forName(attribute.getValue()));
+                                builder.setType(Class.forName(attribute.getValue()));
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             }
-                            constructorArg.setArg(arg.getText());
+                            builder.setArg(arg.getText());
                         } else if ("ref".equals(attribute.getName())) {
-                            constructorArg.setRef(true);
-                            constructorArg.setArg(attribute.getValue());
+                            builder.setRef(true);
+                            builder.setArg(attribute.getValue());
                         }
                         System.out.println("节点名："+attribute.getName()+"节点值："+attribute.getValue());
                     }
-                    constructorArgs.add(constructorArg);
+                    constructorArgs.add(builder.build());
                     beanDefinition.setConstructorArgs(constructorArgs);
                 }
                 beanDefinitions.add(beanDefinition);
